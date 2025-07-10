@@ -46,5 +46,21 @@ public class Course
 
         RequiredSkills.Remove(skill);
     }
+
+    public void AddTimeSlot(TimeSlot slot)
+    {
+        if (IsConfirmed)
+            throw new InvalidOperationException("Cannot add time slots after course is confirmed.");
+
+        if (TimeSlots.Any(existing =>
+            existing.Day == slot.Day &&
+            existing.Start == slot.Start &&
+            existing.End == slot.End))
+        {
+            throw new InvalidOperationException("This time slot already exists.");
+        }
+
+        TimeSlots.Add(slot);
+    }
 }
 
