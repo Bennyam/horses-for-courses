@@ -27,5 +27,24 @@ public class Course
         StartDate = startDate;
         EndDate = endDate;
     }
+
+    public void AddRequiredSkill(Skill skill)
+    {
+        if (IsConfirmed)
+            throw new InvalidOperationException("Cannot modify required skills after course is confirmed.");
+
+        if (!RequiredSkills.Contains(skill))
+        {
+            RequiredSkills.Add(skill);
+        }
+    }
+
+    public void RemoveRequiredSkill(Skill skill)
+    {
+        if (IsConfirmed)
+            throw new InvalidOperationException("Cannot modify required skills after course is confirmed.");
+
+        RequiredSkills.Remove(skill);
+    }
 }
 
