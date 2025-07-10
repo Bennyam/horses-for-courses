@@ -1,0 +1,13 @@
+# Ignore build and VS files
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.csproj.user
+.vscode/
+*.DS_Store
+*.log
+
+# Ignore test results
+TestResults/
