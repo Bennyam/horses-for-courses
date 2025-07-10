@@ -62,5 +62,22 @@ public class Course
 
         TimeSlots.Add(slot);
     }
+
+    public void Confirm()
+    {
+        if (IsConfirmed)
+            throw new InvalidOperationException("Course is already confirmed.");
+
+        if (TimeSlots.Count == 0)
+            throw new InvalidOperationException("Course must have at least one time slot before confirmation.");
+
+        if (StartDate > EndDate)
+            throw new InvalidOperationException("Start date must be before end date.");
+
+        if (string.IsNullOrWhiteSpace(Name))
+            throw new InvalidOperationException("Course must have a name.");
+
+        IsConfirmed = true;
+    }
 }
 
