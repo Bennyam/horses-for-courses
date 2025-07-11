@@ -101,19 +101,14 @@ public class Course
             throw new InvalidOperationException("Coach is not available during the scheduled course time slots.");
 
         AssignedCoach = coach;
-
-        coach.AssignCourseTimeSlots(TimeSlots);
+        coach.AssignCourse(this);
     }
 
     public void UnassignCoach()
     {
         if (AssignedCoach == null) throw new InvalidOperationException("No coach has been assigned to this course.");
 
-        foreach (var slot in TimeSlots)
-        {
-            AssignedCoach.RemoveTimeSlot(slot);
-        }
-
+        AssignedCoach.UnassignCourse(this);
         AssignedCoach = null;
     }
 }

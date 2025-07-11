@@ -1,7 +1,5 @@
 using HorsesForCourses.Core.Models;
 using HorsesForCourses.Core.ValueObjects;
-using System;
-using Xunit;
 
 namespace HorsesForCourses.Tests.Models;
 
@@ -17,7 +15,7 @@ public class CourseAssignCoachTests
     }
 
     [Fact]
-    public void AssignCoach_WithAllConditionsMet_ShouldAssignAndRegisterTimeSlots()
+    public void AssignCoach_WithAllConditionsMet_ShouldAssignCourseToCoach()
     {
         var slot = new TimeSlot(DayOfWeek.Tuesday, new TimeOnly(10, 0), new TimeOnly(12, 0));
         var course = CreateConfirmedCourseWithSlotAndSkill(Skill.Communication, slot);
@@ -28,20 +26,26 @@ public class CourseAssignCoachTests
         course.AssignCoach(coach);
 
         Assert.Equal(coach, course.AssignedCoach);
-        Assert.Single(coach.AssignedTimeSlots);
-        Assert.Equal(slot, coach.AssignedTimeSlots.First());
+        Assert.Single(coach.AssignedCourses);
+        Assert.Contains(course, coach.AssignedCourses);
     }
 
     [Fact]
-    public void AssignCoach_ShouldThrow_WhenCoachHasOverlappingSlot()
+    public void AssignCoach_ShouldThrow_WhenCoachHasOverlappingSlotInOverlappingPeriod()
     {
-        var conflictingSlot = new TimeSlot(DayOfWeek.Wednesday, new TimeOnly(14, 0), new TimeOnly(16, 0));
+        var conflictingCourse = CreateConfirmedCourseWithSlotAndSkill(
+            Skill.DotNet,
+            new TimeSlot(DayOfWeek.Wednesday, new TimeOnly(14, 0), new TimeOnly(16, 0))
+        );
+
         var coach = new Coach("Max", "max@coach.com");
         coach.AddSkill(Skill.DotNet);
-        coach.AssignCourseTimeSlots(new[] { conflictingSlot });
+        coach.AssignCourse(conflictingCourse);
 
-        var newCourse = CreateConfirmedCourseWithSlotAndSkill(Skill.DotNet,
-            new TimeSlot(DayOfWeek.Wednesday, new TimeOnly(15, 0), new TimeOnly(17, 0)));
+        var newCourse = new Course("OverlapCursus", new DateOnly(2025, 9, 15), new DateOnly(2025, 9, 30));
+        newCourse.AddRequiredSkill(Skill.DotNet);
+        newCourse.AddTimeSlot(new TimeSlot(DayOfWeek.Wednesday, new TimeOnly(15, 0), new TimeOnly(17, 0)));
+        newCourse.Confirm();
 
         Assert.Throws<InvalidOperationException>(() => newCourse.AssignCoach(coach));
     }

@@ -27,7 +27,7 @@ public class UnassignCoachTests
         course.UnassignCoach();
 
         Assert.Null(course.AssignedCoach);
-        Assert.Empty(coach.AssignedTimeSlots);
+        Assert.DoesNotContain(course, coach.AssignedCourses);
     }
 
     [Fact]

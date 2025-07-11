@@ -9,8 +9,9 @@ public class Coach
     public string Email { get; private set; }
 
     public List<Skill> Skills { get; private set; } = new();
-    private readonly List<TimeSlot> _assignedTimeSlots = new();
-    public IReadOnlyCollection<TimeSlot> AssignedTimeSlots => _assignedTimeSlots.AsReadOnly();
+
+    private readonly List<Course> _assignedCourses = new();
+    public IReadOnlyCollection<Course> AssignedCourses => _assignedCourses.AsReadOnly();
 
     public Coach(string name, string email)
     {
@@ -37,28 +38,42 @@ public class Coach
         return course.RequiredSkills.All(skill => Skills.Contains(skill));
     }
 
-    public void AssignCourseTimeSlots(IEnumerable<TimeSlot> timeSlots)
+    public void AssignCourse(Course course)
     {
-        _assignedTimeSlots.AddRange(timeSlots);
+        _assignedCourses.Add(course);
     }
 
-    public void RemoveTimeSlot(TimeSlot slot)
+    public void UnassignCourse(Course course)
     {
-        _assignedTimeSlots.RemoveAll(t => t.Day == slot.Day && t.Start == slot.Start && t.End == slot.End);
+        _assignedCourses.Remove(course);
     }
 
     public bool IsAvailableFor(Course course)
     {
-        foreach (var newSlot in course.TimeSlots)
+        foreach (var assigned in _assignedCourses)
         {
-            foreach (var existingSlot in _assignedTimeSlots)
+            if (DatesOverlap(course, assigned))
             {
-                if (newSlot.Day == existingSlot.Day && newSlot.Start < existingSlot.End && newSlot.End > existingSlot.Start)
+                foreach (var newSlot in course.TimeSlots)
                 {
-                    return false;
+                    foreach (var existingSlot in assigned.TimeSlots)
+                    {
+                        if (newSlot.Day == existingSlot.Day &&
+                            newSlot.Start < existingSlot.End &&
+                            newSlot.End > existingSlot.Start)
+                        {
+                            return false;
+                        }
+                    }
                 }
             }
         }
+
         return true;
+    }
+
+    private bool DatesOverlap(Course a, Course b)
+    {
+        return a.StartDate <= b.EndDate && a.EndDate >= b.StartDate;
     }
 }
