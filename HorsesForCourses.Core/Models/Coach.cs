@@ -9,6 +9,8 @@ public class Coach
     public string Email { get; private set; }
 
     public List<Skill> Skills { get; private set; } = new();
+    private readonly List<TimeSlot> _assignedTimeSlots = new();
+    public IReadOnlyCollection<TimeSlot> AssignedTimeSlots => _assignedTimeSlots.AsReadOnly();
 
     public Coach(string name, string email)
     {
@@ -28,5 +30,35 @@ public class Coach
     public void RemoveSkill(Skill skill)
     {
         Skills.Remove(skill);
+    }
+
+    public bool IsSuitableFor(Course course)
+    {
+        return course.RequiredSkills.All(skill => Skills.Contains(skill));
+    }
+
+    public void AssignCourseTimeSlots(IEnumerable<TimeSlot> timeSlots)
+    {
+        _assignedTimeSlots.AddRange(timeSlots);
+    }
+
+    public void RemoveTimeSlot(TimeSlot slot)
+    {
+        _assignedTimeSlots.RemoveAll(t => t.Day == slot.Day && t.Start == slot.Start && t.End == slot.End);
+    }
+
+    public bool IsAvailableFor(Course course)
+    {
+        foreach (var newSlot in course.TimeSlots)
+        {
+            foreach (var existingSlot in _assignedTimeSlots)
+            {
+                if (newSlot.Day == existingSlot.Day && newSlot.Start < existingSlot.End && newSlot.End > existingSlot.Start)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

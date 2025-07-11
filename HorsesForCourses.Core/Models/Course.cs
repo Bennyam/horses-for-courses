@@ -11,8 +11,7 @@ public class Course
     public List<Skill> RequiredSkills { get; private set; } = new();
     public bool IsConfirmed { get; private set; }
 
-    // Coach komt later
-    // public Coach? AssignedCoach { get; private set; }
+    public Coach? AssignedCoach { get; private set; }
 
     public Course(string name, DateOnly startDate, DateOnly endDate)
     {
@@ -63,6 +62,13 @@ public class Course
         TimeSlots.Add(slot);
     }
 
+    public void RemoveTimeSlot(TimeSlot slot)
+    {
+        if (IsConfirmed) throw new InvalidOperationException("Cannot remove time slots after course is confirmed.");
+
+        TimeSlots.RemoveAll(t => t.Day == slot.Day && t.Start == slot.Start && t.End == slot.End);
+    }
+
     public void Confirm()
     {
         if (IsConfirmed)
@@ -78,6 +84,37 @@ public class Course
             throw new InvalidOperationException("Course must have a name.");
 
         IsConfirmed = true;
+    }
+
+    public void AssignCoach(Coach coach)
+    {
+        if (!IsConfirmed)
+            throw new InvalidOperationException("Cannot assign a coach before the course is confirmed.");
+
+        if (AssignedCoach != null)
+            throw new InvalidOperationException("A coach has already been assigned to this course.");
+
+        if (!coach.IsSuitableFor(this))
+            throw new InvalidOperationException("Coach does not have all the required skills for this course.");
+
+        if (!coach.IsAvailableFor(this))
+            throw new InvalidOperationException("Coach is not available during the scheduled course time slots.");
+
+        AssignedCoach = coach;
+
+        coach.AssignCourseTimeSlots(TimeSlots);
+    }
+
+    public void UnassignCoach()
+    {
+        if (AssignedCoach == null) throw new InvalidOperationException("No coach has been assigned to this course.");
+
+        foreach (var slot in TimeSlots)
+        {
+            AssignedCoach.RemoveTimeSlot(slot);
+        }
+
+        AssignedCoach = null;
     }
 }
 
