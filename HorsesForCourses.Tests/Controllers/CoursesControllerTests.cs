@@ -4,8 +4,6 @@ using HorsesForCourses.WebApi.Storage;
 using HorsesForCourses.Core.Models;
 using HorsesForCourses.Core.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
-using Xunit;
-using System;
 
 namespace HorsesForCourses.Tests.Controllers;
 
