@@ -24,11 +24,11 @@ public class CoachesControllerTests
     var result = controller.RegisterCoach(request);
 
     var created = Assert.IsType<CreatedAtActionResult>(result);
-    var coach = Assert.IsType<Coach>(created.Value);
+    var coachDto = Assert.IsType<CoachDto>(created.Value);
 
-    Assert.Equal(request.Name, coach.Name);
-    Assert.Equal(request.Email, coach.Email);
-    Assert.NotEqual(Guid.Empty, coach.Id);
+    Assert.Equal(request.Name, coachDto.Name);
+    Assert.Equal(request.Email, coachDto.Email);
+    Assert.NotEqual(Guid.Empty, coachDto.Id);
   }
 
   [Fact]
