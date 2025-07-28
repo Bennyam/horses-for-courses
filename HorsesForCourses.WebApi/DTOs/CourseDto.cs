@@ -10,6 +10,6 @@ public class CourseDto
     public DateOnly EndDate { get; set; }
     public bool IsConfirmed { get; set; }
     public List<Skill> RequiredSkills { get; set; } = new();
-    public List<TimeSlot> TimeSlots { get; set; } = new();
+    public List<TimeSlotDto> TimeSlots { get; set; } = new();
     public Guid? AssignedCoachId { get; set; }
 }

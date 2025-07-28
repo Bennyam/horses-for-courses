@@ -54,7 +54,14 @@ public class CoursesController : ControllerBase
             EndDate = course.EndDate,
             IsConfirmed = course.IsConfirmed,
             RequiredSkills = course.RequiredSkills.ToList(),
-            TimeSlots = course.TimeSlots.ToList(),
+            TimeSlots = course.TimeSlots
+                .Select(ts => new TimeSlotDto
+                {
+                    Day = ts.Day,
+                    Start = ts.Start,
+                    End = ts.End
+                })
+                .ToList(),
             AssignedCoachId = course.AssignedCoach?.Id
         };
 

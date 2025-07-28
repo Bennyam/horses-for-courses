@@ -19,22 +19,27 @@ public class CoachesController : ControllerBase
     [HttpPost]
     public ActionResult RegisterCoach(CreateCoachRequest request)
     {
-        try
+        if (request == null || string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Email))
         {
-            var coach = new Coach(request.Name, request.Email);
-            _repository.Add(coach);
+            return Problem(
+                title: "Ongeldige aanvraag",
+                detail: "Naam en e-mail mogen niet leeg zijn.",
+                statusCode: 400
+            );
+        }
 
-            return CreatedAtAction(nameof(GetById), new { id = coach.Id }, coach);
-        }
-        catch (ArgumentException ex)
+        var coach = new Coach(request.Name, request.Email);
+        _repository.Add(coach);
+
+        var dto = new CoachDto
         {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Ongeldige input",
-                Detail = ex.Message,
-                Status = 400
-            });
-        }
+            Id = coach.Id,
+            Name = coach.Name,
+            Email = coach.Email,
+            Skills = coach.Skills.ToList(),
+            AssignedCourseIds = coach.AssignedCourses.Select(c => c.Id).ToList()
+        };
+        return CreatedAtAction(nameof(GetById), new { id = coach.Id }, dto);
     }
 
     [HttpGet("{id}")]
